@@ -757,32 +757,23 @@
                 <div class="sf-header">
                     <span class="sf-emoji">🎉</span>
                     <div class="sf-title">5개 모두 완료!</div>
-                    <p class="sf-desc">이름과 학번을 입력하면<br>상품권 추첨 대상에 등록됩니다!</p>
+                    <p class="sf-desc">아래 버튼을 눌러 구글 폼을 작성하면<br>상품권 추첨 대상에 등록됩니다!</p>
                 </div>
-                <div class="input-group">
-                    <label class="input-label">이름</label>
-                    <input type="text" class="text-input" id="nameInput" placeholder="예) 홍길동" maxlength="6">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">학번</label>
-                    <input type="number" class="text-input" id="idInput" placeholder="예) 10101">
-                </div>
-                <button class="submit-btn" onclick="submitData()" id="submitBtn">📋 제출하기</button>
+                <button class="submit-btn" onclick="submitData()" id="submitBtn">📋 구글 폼 작성하기</button>
             </div>
 
             <!-- 제출 완료 -->
             <div class="submitted" id="submittedDiv">
                 <span class="submitted-emoji">🏆</span>
                 <div class="submitted-title">제출 완료!</div>
-                <p class="submitted-desc">추첨 명단에 등록됐어요!<br>5월 21일(목) 점심 방송을 기다려주세요!</p>
+                <p class="submitted-desc">구글 폼 작성을 완료하셨나요?<br>5월 21일(목) 점심 방송을 기다려주세요!</p>
                 <div class="submitted-info">
-                    <div class="si-row"><span class="si-label">이름</span><span class="si-val" id="siName">-</span></div>
-                    <div class="si-row"><span class="si-label">학번</span><span class="si-val" id="siId">-</span></div>
                     <div class="si-row"><span class="si-label">완료 스테이션</span><span class="si-val">5 / 5</span></div>
                     <div class="si-row"><span class="si-label">제출 시각</span><span class="si-val" id="siTime">-</span>
                     </div>
                 </div>
                 <p class="submit-note">이 화면을 스크린샷으로 캡처해두세요!</p>
+                <button class="submit-btn" style="margin-top: 10px; font-size: 14px; padding: 12px; background: rgba(255,255,255,0.1); color: white;" onclick="window.open('https://docs.google.com/forms/d/19ojm2ecDA6F63sLNpDxgTXda0kMMwd_SUvcNAfExv7M/viewform', '_blank')">📝 구글 폼 다시 열기</button>
             </div>
 
 
@@ -810,10 +801,8 @@
     <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
 
     <script>
-        // 구글 설문지 URL (entry 파라미터로 학번/이름 자동 입력)
-        const FORM_BASE = 'https://docs.google.com/forms/d/e/1FAIpQLSdUxIyewSQ4V2nfd9lWYQHx9z0jVZfuUJJ75BXl6uylCHFMSA/viewform';
-        const ENTRY_STUDENT_ID = 'entry.752762419';   // 학번 필드
-        const ENTRY_NAME       = 'entry.1948160180';  // 이름 필드
+        // 구글 설문지 URL
+        const FORM_BASE = 'https://docs.google.com/forms/d/19ojm2ecDA6F63sLNpDxgTXda0kMMwd_SUvcNAfExv7M/viewform';
 
         const STATIONS = [
             { key: 'qr1_done', cardId: 'card1', statusId: 'status1', stampId: 'stamp1' },
@@ -850,22 +839,12 @@
         }
 
         function submitData() {
-            const name = document.getElementById('nameInput').value.trim();
-            const sid = document.getElementById('idInput').value.trim();
-            if (!name) { alert('이름을 입력해주세요!'); return; }
-            if (!sid || sid.length < 4) { alert('학번을 입력해주세요!'); return; }
-
             // 로컬에 저장
             localStorage.setItem('qr_submitted', '1');
-            localStorage.setItem('qr_name', name);
-            localStorage.setItem('qr_id', sid);
             localStorage.setItem('qr_time', new Date().toLocaleString('ko-KR'));
 
-            // 이름·학번을 pre-fill한 구글 설문지를 새 탭으로 열기
-            const url = FORM_BASE
-                + '?' + ENTRY_STUDENT_ID + '=' + encodeURIComponent(sid)
-                + '&' + ENTRY_NAME       + '=' + encodeURIComponent(name);
-            window.open(url, '_blank');
+            // 구글 설문지를 새 탭으로 열기
+            window.open(FORM_BASE, '_blank');
 
             // 제출 완료 화면으로 전환
             showSubmitted();
@@ -877,8 +856,6 @@
             document.getElementById('submitForm').classList.remove('show');
             document.getElementById('submitForm').style.display = 'none';
             document.getElementById('submittedDiv').classList.add('show');
-            document.getElementById('siName').textContent = localStorage.getItem('qr_name') || '-';
-            document.getElementById('siId').textContent = localStorage.getItem('qr_id') || '-';
             document.getElementById('siTime').textContent = localStorage.getItem('qr_time') || '-';
         }
 
