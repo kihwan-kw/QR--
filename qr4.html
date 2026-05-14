@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>STATION 04 — 도박과 가족</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --ac: #ffe600;
+            --ac-rgb: 255, 230, 0;
+            --bg: #07080f;
+            --card: #111219;
+            --border: rgba(255, 255, 255, 0.07)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 230, 0, .02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 230, 0, .02) 1px, transparent 1px);
+            background-size: 36px 36px;
+            pointer-events: none;
+            z-index: 0
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px 60px
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px
+        }
+
+        .back-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-decoration: none;
+            flex-shrink: 0
+        }
+
+        .station-tag {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--ac);
+            text-transform: uppercase
+        }
+
+        .article-card {
+            background: var(--card);
+            border: 1px solid rgba(var(--ac-rgb), .2);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            animation: fadeInUp .4s ease
+        }
+
+        .ac-header {
+            background: linear-gradient(135deg, rgba(var(--ac-rgb), .12), rgba(var(--ac-rgb), .04));
+            padding: 20px;
+            border-bottom: 1px solid rgba(var(--ac-rgb), .12)
+        }
+
+        .ac-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block
+        }
+
+        .ac-num {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--ac);
+            text-transform: uppercase;
+            margin-bottom: 4px
+        }
+
+        .ac-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 24px;
+            margin-bottom: 4px
+        }
+
+        .ac-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .5)
+        }
+
+        .ac-loc {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, .35);
+            margin-top: 8px
+        }
+
+        .ac-body {
+            padding: 20px
+        }
+
+        .article-text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: rgba(255, 255, 255, .8);
+            white-space: pre-line
+        }
+
+        .read-progress {
+            height: 3px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 0;
+            overflow: hidden;
+            position: relative
+        }
+
+        .rp-fill {
+            height: 100%;
+            background: var(--ac);
+            width: 0%;
+            transition: width .1s linear;
+            border-radius: 0
+        }
+
+        .read-info {
+            padding: 10px 20px 0;
+            font-size: 11px;
+            color: rgba(255, 255, 255, .3);
+            text-align: center
+        }
+
+        .next-btn {
+            width: calc(100% - 40px);
+            margin: 16px 20px 20px;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--ac), rgba(var(--ac-rgb), .7));
+            color: #000;
+            border: none;
+            border-radius: 13px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 17px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all .2s;
+            opacity: .4;
+            pointer-events: none
+        }
+
+        .next-btn.enabled {
+            opacity: 1;
+            pointer-events: all
+        }
+
+        .next-btn.enabled:active {
+            transform: scale(.97)
+        }
+
+        .quiz-section {
+            display: none;
+            animation: fadeInUp .4s ease
+        }
+
+        .quiz-section.show {
+            display: block
+        }
+
+        .quiz-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 14px
+        }
+
+        .qc-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px
+        }
+
+        .qc-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--ac);
+            text-transform: uppercase
+        }
+
+        .qc-station {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .25)
+        }
+
+        .qc-text {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.6;
+            margin-bottom: 18px
+        }
+
+        .choice-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .choice-btn {
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .03);
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: all .18s;
+            line-height: 1.5
+        }
+
+        .choice-btn:active {
+            transform: scale(.98)
+        }
+
+        .choice-btn.correct {
+            background: rgba(0, 255, 136, .12);
+            border-color: #00ff88;
+            color: #00ff88
+        }
+
+        .choice-btn.wrong {
+            background: rgba(255, 45, 85, .12);
+            border-color: #ff2d55;
+            color: #ff2d55;
+            animation: shake .3s ease
+        }
+
+        .choice-btn:disabled {
+            cursor: default
+        }
+
+        .result-panel {
+            display: none;
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 12px
+        }
+
+        .result-panel.show {
+            display: block;
+            animation: slideUp .3s ease
+        }
+
+        .rp-correct {
+            background: rgba(0, 255, 136, .07);
+            border: 1px solid rgba(0, 255, 136, .25)
+        }
+
+        .rp-wrong {
+            background: rgba(255, 45, 85, .07);
+            border: 1px solid rgba(255, 45, 85, .25)
+        }
+
+        .rp-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px
+        }
+
+        .rp-icon {
+            font-size: 24px
+        }
+
+        .rp-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 17px
+        }
+
+        .rp-correct .rp-title {
+            color: #00ff88
+        }
+
+        .rp-wrong .rp-title {
+            color: #ff2d55
+        }
+
+        .rp-explain {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .65);
+            line-height: 1.6;
+            margin-bottom: 14px
+        }
+
+        .complete-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--ac), rgba(var(--ac-rgb), .7));
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            letter-spacing: 1px
+        }
+
+        .complete-btn:active {
+            transform: scale(.97)
+        }
+
+        .retry-btn {
+            width: 100%;
+            padding: 13px;
+            background: rgba(255, 45, 85, .1);
+            border: 1px solid rgba(255, 45, 85, .25);
+            color: #ff2d55;
+            border-radius: 12px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            25% {
+                transform: translateX(-5px)
+            }
+
+            75% {
+                transform: translateX(5px)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="top-bar">
+            <a href="qr_hub.html" class="back-btn">← 허브</a>
+            <span class="station-tag">👨‍👩‍👧 STATION 04</span>
+        </div>
+
+        <!-- 글 섹션 -->
+        <div class="article-card" id="articleSection">
+            <div class="ac-header">
+                <span class="ac-icon">👨‍👩‍👧</span>
+                <div class="ac-num">STATION 04 / 5</div>
+                <div class="ac-title">도박과 가족</div>
+                <div class="ac-sub">혼자만의 문제가 아닙니다</div>
+                <div class="ac-loc">📍 도서관·열람실</div>
+            </div>
+            <div class="read-progress">
+                <div class="rp-fill" id="readFill"></div>
+            </div>
+            <div class="read-info" id="readInfo">글을 끝까지 읽으면 문제가 열립니다</div>
+            <div class="ac-body">
+                <div class="article-text" id="articleText">도박 중독은 당사자만의 문제가 아닙니다. 가족 전체가 함께 고통받게 됩니다.
+
+                    <b style="color:#ffe600">경제적 피해</b>
+                    도박 중독자는 도박 자금을 마련하기 위해 가족의 돈을 몰래 가져가거나, 부모님 카드를 무단으로 사용하는 경우가 많습니다. 한 청소년의 도박 중독으로 가족이 수천만 원의 빚을 지게
+                    된 사례도 있습니다.
+
+                    <b style="color:#ffe600">심리적 피해</b>
+                    부모님은 자녀의 중독을 발견했을 때 죄책감과 충격, 분노를 동시에 느낍니다. 형제자매는 부모님의 관심이 중독 자녀에게 집중되면서 소외감을 느끼기도 해요.
+
+                    <b style="color:#ffe600">관계 붕괴</b>
+                    신뢰가 무너지면 회복하는 데 오랜 시간이 걸립니다. 도박 중독으로 인한 가정 불화는 청소년의 학업과 정서 발달에도 심각한 영향을 미칩니다.
+
+                    <b style="color:#00ff88">가족 중 도박 문제가 있다면</b>
+                    혼자 해결하려 하지 마세요. 한국도박문제예방치유원(<b style="color:#00ff88">☎ 1336</b>)에서는 도박 중독 당사자뿐 아니라 <b
+                        style="color:#00ff88">가족을 위한 상담도 무료</b>로 제공합니다.
+                </div>
+            </div>
+            <button class="next-btn" id="nextBtn" onclick="showQuiz()">문제 풀기 →</button>
+        </div>
+
+        <!-- 퀴즈 섹션 -->
+        <div class="quiz-section" id="quizSection">
+            <div class="quiz-card">
+                <div class="qc-top">
+                    <div class="qc-label">📝 미션 퀴즈</div>
+                    <div class="qc-station">STATION 04</div>
+                </div>
+                <div class="qc-text">도박 중독이 가족에게 미치는 영향으로 올바른 것은?</div>
+                <div class="choice-list" id="choiceList"></div>
+                <div class="result-panel" id="resultPanel">
+                    <div class="rp-top">
+                        <div class="rp-icon" id="rpIcon">✅</div>
+                        <div class="rp-title" id="rpTitle">정답!</div>
+                    </div>
+                    <div class="rp-explain" id="rpExplain">도박 중독은 당사자뿐 아니라 가족 전체가 경제적·심리적 피해를 받습니다. 1336에서 가족 상담도 무료로 받을
+                        수 있어요.</div>
+                    <button class="complete-btn" id="completeBtn" onclick="complete()" style="display:none">✅ 스테이션 04
+                        완료!</button>
+                    <button class="retry-btn" id="retryBtn" onclick="retry()" style="display:none">🔄 다시 도전하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CHOICES = ["경제적·심리적 피해를 함께 받는다", "당사자만 피해를 받고 가족은 영향 없다", "가족이 막아주면 중독이 저절로 낫는다"];
+        const CORRECT_IDX = 0;
+        const KEY = 'qr4_done';
+
+        // 이미 완료한 경우
+        if (localStorage.getItem(KEY) === '1') {
+            document.getElementById('nextBtn').textContent = '✅ 이미 완료한 스테이션입니다';
+            document.getElementById('nextBtn').classList.add('enabled');
+            document.getElementById('nextBtn').style.background = 'rgba(0,255,136,.2)';
+            document.getElementById('nextBtn').style.border = '1px solid rgba(0,255,136,.3)';
+            document.getElementById('nextBtn').style.color = '#00ff88';
+            document.getElementById('nextBtn').onclick = () => location.href = 'qr_hub.html';
+        }
+
+        // 글 읽기 진행도
+        const article = document.getElementById('articleText');
+        const fill = document.getElementById('readFill');
+        const info = document.getElementById('readInfo');
+        const btn = document.getElementById('nextBtn');
+        let readDone = localStorage.getItem(KEY) === '1';
+
+        function checkRead() {
+            const rect = article.getBoundingClientRect();
+            const winH = window.innerHeight;
+            const articleH = article.offsetHeight;
+            const scrolled = Math.max(0, winH - rect.top);
+            const pct = Math.min(100, (scrolled / articleH) * 100);
+            fill.style.width = pct + '%';
+            if (pct >= 90 || readDone) {
+                btn.classList.add('enabled');
+                info.textContent = '✅ 글을 모두 읽었어요! 문제를 풀어보세요';
+                info.style.color = '#00ff88';
+            } else {
+                info.textContent = '아래로 스크롤하여 글을 끝까지 읽으세요 (' + Math.round(pct) + '%)';
+            }
+        }
+
+        window.addEventListener('scroll', checkRead);
+        window.addEventListener('load', checkRead);
+
+        // 퀴즈
+        function showQuiz() {
+            if (!btn.classList.contains('enabled')) return;
+            document.getElementById('articleSection').style.display = 'none';
+            const qs = document.getElementById('quizSection');
+            qs.classList.add('show');
+            renderChoices();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderChoices() {
+            const list = document.getElementById('choiceList');
+            list.innerHTML = '';
+            CHOICES.forEach((c, i) => {
+                const b = document.createElement('button');
+                b.className = 'choice-btn';
+                b.textContent = c;
+                b.onclick = () => answer(i, b);
+                list.appendChild(b);
+            });
+        }
+
+        function answer(idx, btn) {
+            document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+            const panel = document.getElementById('resultPanel');
+            panel.style.display = 'block';
+            if (idx === CORRECT_IDX) {
+                btn.classList.add('correct');
+                panel.className = 'result-panel show rp-correct';
+                document.getElementById('rpIcon').textContent = '🎉';
+                document.getElementById('rpTitle').textContent = '정답입니다!';
+                document.getElementById('completeBtn').style.display = 'block';
+            } else {
+                btn.classList.add('wrong');
+                document.querySelectorAll('.choice-btn')[CORRECT_IDX].classList.add('correct');
+                panel.className = 'result-panel show rp-wrong';
+                document.getElementById('rpIcon').textContent = '❌';
+                document.getElementById('rpTitle').textContent = '틀렸어요!';
+                document.getElementById('retryBtn').style.display = 'block';
+            }
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function retry() {
+            document.getElementById('resultPanel').style.display = 'none';
+            document.getElementById('resultPanel').className = 'result-panel';
+            document.getElementById('completeBtn').style.display = 'none';
+            document.getElementById('retryBtn').style.display = 'none';
+            renderChoices();
+        }
+
+        function complete() {
+            localStorage.setItem(KEY, '1');
+            location.href = 'qr_hub.html';
+        }
+    </script>
+</body>
+
+</html>

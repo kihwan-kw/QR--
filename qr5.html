@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>STATION 05 — 건강한 스트레스 해소법</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --ac: #ff6b00;
+            --ac-rgb: 255, 107, 0;
+            --bg: #07080f;
+            --card: #111219;
+            --border: rgba(255, 255, 255, 0.07)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 107, 0, .02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 107, 0, .02) 1px, transparent 1px);
+            background-size: 36px 36px;
+            pointer-events: none;
+            z-index: 0
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px 60px
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px
+        }
+
+        .back-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-decoration: none;
+            flex-shrink: 0
+        }
+
+        .station-tag {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--ac);
+            text-transform: uppercase
+        }
+
+        .article-card {
+            background: var(--card);
+            border: 1px solid rgba(var(--ac-rgb), .2);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            animation: fadeInUp .4s ease
+        }
+
+        .ac-header {
+            background: linear-gradient(135deg, rgba(var(--ac-rgb), .12), rgba(var(--ac-rgb), .04));
+            padding: 20px;
+            border-bottom: 1px solid rgba(var(--ac-rgb), .12)
+        }
+
+        .ac-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block
+        }
+
+        .ac-num {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--ac);
+            text-transform: uppercase;
+            margin-bottom: 4px
+        }
+
+        .ac-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 24px;
+            margin-bottom: 4px
+        }
+
+        .ac-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .5)
+        }
+
+        .ac-loc {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, .35);
+            margin-top: 8px
+        }
+
+        .ac-body {
+            padding: 20px
+        }
+
+        .article-text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: rgba(255, 255, 255, .8);
+            white-space: pre-line
+        }
+
+        .read-progress {
+            height: 3px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 0;
+            overflow: hidden;
+            position: relative
+        }
+
+        .rp-fill {
+            height: 100%;
+            background: var(--ac);
+            width: 0%;
+            transition: width .1s linear;
+            border-radius: 0
+        }
+
+        .read-info {
+            padding: 10px 20px 0;
+            font-size: 11px;
+            color: rgba(255, 255, 255, .3);
+            text-align: center
+        }
+
+        .next-btn {
+            width: calc(100% - 40px);
+            margin: 16px 20px 20px;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--ac), rgba(var(--ac-rgb), .7));
+            color: #000;
+            border: none;
+            border-radius: 13px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 17px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all .2s;
+            opacity: .4;
+            pointer-events: none
+        }
+
+        .next-btn.enabled {
+            opacity: 1;
+            pointer-events: all
+        }
+
+        .next-btn.enabled:active {
+            transform: scale(.97)
+        }
+
+        .quiz-section {
+            display: none;
+            animation: fadeInUp .4s ease
+        }
+
+        .quiz-section.show {
+            display: block
+        }
+
+        .quiz-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 14px
+        }
+
+        .qc-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px
+        }
+
+        .qc-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--ac);
+            text-transform: uppercase
+        }
+
+        .qc-station {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .25)
+        }
+
+        .qc-text {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.6;
+            margin-bottom: 18px
+        }
+
+        .choice-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .choice-btn {
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .03);
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: all .18s;
+            line-height: 1.5
+        }
+
+        .choice-btn:active {
+            transform: scale(.98)
+        }
+
+        .choice-btn.correct {
+            background: rgba(0, 255, 136, .12);
+            border-color: #00ff88;
+            color: #00ff88
+        }
+
+        .choice-btn.wrong {
+            background: rgba(255, 45, 85, .12);
+            border-color: #ff2d55;
+            color: #ff2d55;
+            animation: shake .3s ease
+        }
+
+        .choice-btn:disabled {
+            cursor: default
+        }
+
+        .result-panel {
+            display: none;
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 12px
+        }
+
+        .result-panel.show {
+            display: block;
+            animation: slideUp .3s ease
+        }
+
+        .rp-correct {
+            background: rgba(0, 255, 136, .07);
+            border: 1px solid rgba(0, 255, 136, .25)
+        }
+
+        .rp-wrong {
+            background: rgba(255, 45, 85, .07);
+            border: 1px solid rgba(255, 45, 85, .25)
+        }
+
+        .rp-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px
+        }
+
+        .rp-icon {
+            font-size: 24px
+        }
+
+        .rp-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 17px
+        }
+
+        .rp-correct .rp-title {
+            color: #00ff88
+        }
+
+        .rp-wrong .rp-title {
+            color: #ff2d55
+        }
+
+        .rp-explain {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .65);
+            line-height: 1.6;
+            margin-bottom: 14px
+        }
+
+        .complete-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--ac), rgba(var(--ac-rgb), .7));
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            letter-spacing: 1px
+        }
+
+        .complete-btn:active {
+            transform: scale(.97)
+        }
+
+        .retry-btn {
+            width: 100%;
+            padding: 13px;
+            background: rgba(255, 45, 85, .1);
+            border: 1px solid rgba(255, 45, 85, .25);
+            color: #ff2d55;
+            border-radius: 12px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            25% {
+                transform: translateX(-5px)
+            }
+
+            75% {
+                transform: translateX(5px)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="top-bar">
+            <a href="qr_hub.html" class="back-btn">← 허브</a>
+            <span class="station-tag">💪 STATION 05</span>
+        </div>
+
+        <!-- 글 섹션 -->
+        <div class="article-card" id="articleSection">
+            <div class="ac-header">
+                <span class="ac-icon">💪</span>
+                <div class="ac-num">STATION 05 / 5</div>
+                <div class="ac-title">건강한 스트레스 해소법</div>
+                <div class="ac-sub">도박 없이도 짜릿함을 느낄 수 있어요</div>
+                <div class="ac-loc">📍 자치회실 앞</div>
+            </div>
+            <div class="read-progress">
+                <div class="rp-fill" id="readFill"></div>
+            </div>
+            <div class="read-info" id="readInfo">글을 끝까지 읽으면 문제가 열립니다</div>
+            <div class="ac-body">
+                <div class="article-text" id="articleText">도박이 왜 매력적으로 느껴질까요? 스트레스를 순간적으로 해소하고, 짜릿한 흥분감을 주기 때문이에요. 하지만 이
+                    쾌감은 오래가지 않고 더 큰 문제를 남깁니다.
+
+                    <b style="color:#ff6b00">도박 대신 도파민을 얻는 방법들</b>
+
+                    🏃 <b style="color:#ff6b00">운동</b>
+                    달리기, 농구, 축구 등 운동할 때도 도파민이 분비됩니다. 게다가 운동 후 성취감은 도박과 달리 부작용이 없어요.
+
+                    🎮 <b style="color:#ff6b00">건전한 게임</b>
+                    도박 요소가 없는 게임, 특히 실력이 쌓이는 게임은 건강한 성취감을 줍니다. 단, 과도한 시간 투자는 주의!
+
+                    🎵 <b style="color:#ff6b00">음악·창작 활동</b>
+                    악기 연주, 그림 그리기, 글쓰기 등 창작 활동은 스트레스 해소와 함께 자신만의 결과물을 만들어냅니다.
+
+                    👥 <b style="color:#ff6b00">친구와 대화</b>
+                    힘든 감정을 친구나 어른과 나누는 것만으로도 스트레스가 크게 줄어들어요.
+
+                    <b style="color:#00ff88">핵심은</b> 순간의 짜릿함이 아니라, <b style="color:#00ff88">지속 가능한 즐거움</b>을 찾는 것입니다. 도박은
+                    순간의 쾌감을 위해 미래를 담보로 잡아요.
+                </div>
+            </div>
+            <button class="next-btn" id="nextBtn" onclick="showQuiz()">문제 풀기 →</button>
+        </div>
+
+        <!-- 퀴즈 섹션 -->
+        <div class="quiz-section" id="quizSection">
+            <div class="quiz-card">
+                <div class="qc-top">
+                    <div class="qc-label">📝 미션 퀴즈</div>
+                    <div class="qc-station">STATION 05</div>
+                </div>
+                <div class="qc-text">도박 없이 건강하게 도파민을 얻을 수 있는 방법이 아닌 것은?</div>
+                <div class="choice-list" id="choiceList"></div>
+                <div class="result-panel" id="resultPanel">
+                    <div class="rp-top">
+                        <div class="rp-icon" id="rpIcon">✅</div>
+                        <div class="rp-title" id="rpTitle">정답!</div>
+                    </div>
+                    <div class="rp-explain" id="rpExplain">소액 도박이라도 습관이 되면 중독으로 이어질 수 있어요. 운동, 창작, 대화 등 건강한 방법으로 스트레스를
+                        해소하세요!</div>
+                    <button class="complete-btn" id="completeBtn" onclick="complete()" style="display:none">✅ 스테이션 05
+                        완료!</button>
+                    <button class="retry-btn" id="retryBtn" onclick="retry()" style="display:none">🔄 다시 도전하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CHOICES = ["소액이라도 도박으로 스트레스 해소", "친구들과 운동하기", "음악 듣기·악기 연주하기"];
+        const CORRECT_IDX = 0;
+        const KEY = 'qr5_done';
+
+        // 이미 완료한 경우
+        if (localStorage.getItem(KEY) === '1') {
+            document.getElementById('nextBtn').textContent = '✅ 이미 완료한 스테이션입니다';
+            document.getElementById('nextBtn').classList.add('enabled');
+            document.getElementById('nextBtn').style.background = 'rgba(0,255,136,.2)';
+            document.getElementById('nextBtn').style.border = '1px solid rgba(0,255,136,.3)';
+            document.getElementById('nextBtn').style.color = '#00ff88';
+            document.getElementById('nextBtn').onclick = () => location.href = 'qr_hub.html';
+        }
+
+        // 글 읽기 진행도
+        const article = document.getElementById('articleText');
+        const fill = document.getElementById('readFill');
+        const info = document.getElementById('readInfo');
+        const btn = document.getElementById('nextBtn');
+        let readDone = localStorage.getItem(KEY) === '1';
+
+        function checkRead() {
+            const rect = article.getBoundingClientRect();
+            const winH = window.innerHeight;
+            const articleH = article.offsetHeight;
+            const scrolled = Math.max(0, winH - rect.top);
+            const pct = Math.min(100, (scrolled / articleH) * 100);
+            fill.style.width = pct + '%';
+            if (pct >= 90 || readDone) {
+                btn.classList.add('enabled');
+                info.textContent = '✅ 글을 모두 읽었어요! 문제를 풀어보세요';
+                info.style.color = '#00ff88';
+            } else {
+                info.textContent = '아래로 스크롤하여 글을 끝까지 읽으세요 (' + Math.round(pct) + '%)';
+            }
+        }
+
+        window.addEventListener('scroll', checkRead);
+        window.addEventListener('load', checkRead);
+
+        // 퀴즈
+        function showQuiz() {
+            if (!btn.classList.contains('enabled')) return;
+            document.getElementById('articleSection').style.display = 'none';
+            const qs = document.getElementById('quizSection');
+            qs.classList.add('show');
+            renderChoices();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderChoices() {
+            const list = document.getElementById('choiceList');
+            list.innerHTML = '';
+            CHOICES.forEach((c, i) => {
+                const b = document.createElement('button');
+                b.className = 'choice-btn';
+                b.textContent = c;
+                b.onclick = () => answer(i, b);
+                list.appendChild(b);
+            });
+        }
+
+        function answer(idx, btn) {
+            document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+            const panel = document.getElementById('resultPanel');
+            panel.style.display = 'block';
+            if (idx === CORRECT_IDX) {
+                btn.classList.add('correct');
+                panel.className = 'result-panel show rp-correct';
+                document.getElementById('rpIcon').textContent = '🎉';
+                document.getElementById('rpTitle').textContent = '정답입니다!';
+                document.getElementById('completeBtn').style.display = 'block';
+            } else {
+                btn.classList.add('wrong');
+                document.querySelectorAll('.choice-btn')[CORRECT_IDX].classList.add('correct');
+                panel.className = 'result-panel show rp-wrong';
+                document.getElementById('rpIcon').textContent = '❌';
+                document.getElementById('rpTitle').textContent = '틀렸어요!';
+                document.getElementById('retryBtn').style.display = 'block';
+            }
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function retry() {
+            document.getElementById('resultPanel').style.display = 'none';
+            document.getElementById('resultPanel').className = 'result-panel';
+            document.getElementById('completeBtn').style.display = 'none';
+            document.getElementById('retryBtn').style.display = 'none';
+            renderChoices();
+        }
+
+        function complete() {
+            localStorage.setItem(KEY, '1');
+            location.href = 'qr_hub.html';
+        }
+    </script>
+</body>
+
+</html>

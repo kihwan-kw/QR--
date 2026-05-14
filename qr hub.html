@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>QR 스탬프 랠리</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --green: #00ff88;
+            --blue: #00c8ff;
+            --red: #ff2d55;
+            --yellow: #ffe600;
+            --orange: #ff6b00;
+            --bg: #07080f;
+            --card: #111219;
+            --border: rgba(255, 255, 255, 0.07)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(0, 255, 136, .02) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 136, .02) 1px, transparent 1px);
+            background-size: 36px 36px;
+            pointer-events: none;
+            z-index: 0
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 24px 16px 60px
+        }
+
+        /* 헤더 */
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+            animation: fadeInUp .5s ease
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(0, 255, 136, .1);
+            border: 1px solid rgba(0, 255, 136, .25);
+            color: var(--green);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+            text-transform: uppercase
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 32px;
+            line-height: 1.2;
+            margin-bottom: 8px
+        }
+
+        .title em {
+            color: var(--green);
+            text-shadow: 0 0 20px rgba(0, 255, 136, .5);
+            font-style: normal
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .5);
+            line-height: 1.7
+        }
+
+        /* 진행 현황 */
+        .progress-wrap {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+            animation: fadeInUp .5s .1s ease both
+        }
+
+        .pw-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px
+        }
+
+        .pw-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .35);
+            letter-spacing: 2px;
+            text-transform: uppercase
+        }
+
+        .pw-count {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 18px;
+            color: var(--green)
+        }
+
+        .pw-bar-bg {
+            background: rgba(255, 255, 255, .06);
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 12px
+        }
+
+        .pw-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), var(--blue));
+            border-radius: 4px;
+            transition: width .8s ease
+        }
+
+        .stamp-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center
+        }
+
+        .stamp {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: rgba(255, 255, 255, .03);
+            transition: all .4s;
+            position: relative
+        }
+
+        .stamp.done {
+            background: rgba(0, 255, 136, .1);
+            border-color: rgba(0, 255, 136, .35);
+            animation: stampPop .4s ease
+        }
+
+        .stamp.done::after {
+            content: '✓';
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: var(--green);
+            color: #000;
+            font-size: 10px;
+            font-weight: 900;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        @keyframes stampPop {
+            0% {
+                transform: scale(.5)
+            }
+
+            70% {
+                transform: scale(1.15)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        /* 스테이션 목록 */
+        .stations {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px
+        }
+
+        .station-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: inherit;
+            transition: all .2s;
+            position: relative;
+            overflow: hidden
+        }
+
+        .station-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity .2s
+        }
+
+        .station-card:hover::before {
+            opacity: 1
+        }
+
+        .station-card:active {
+            transform: scale(.98)
+        }
+
+        .sc-1 {
+            --ac: #00ff88
+        }
+
+        .sc-1::before {
+            background: linear-gradient(135deg, rgba(0, 255, 136, .06), transparent)
+        }
+
+        .sc-2 {
+            --ac: #00c8ff
+        }
+
+        .sc-2::before {
+            background: linear-gradient(135deg, rgba(0, 200, 255, .06), transparent)
+        }
+
+        .sc-3 {
+            --ac: #ff2d55
+        }
+
+        .sc-3::before {
+            background: linear-gradient(135deg, rgba(255, 45, 85, .06), transparent)
+        }
+
+        .sc-4 {
+            --ac: #ffe600
+        }
+
+        .sc-4::before {
+            background: linear-gradient(135deg, rgba(255, 230, 0, .06), transparent)
+        }
+
+        .sc-5 {
+            --ac: #ff6b00
+        }
+
+        .sc-5::before {
+            background: linear-gradient(135deg, rgba(255, 107, 0, .06), transparent)
+        }
+
+        .station-card.done {
+            border-color: rgba(0, 255, 136, .25)
+        }
+
+        .station-card.done::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent)
+        }
+
+        .sc-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: rgba(255, 255, 255, .04)
+        }
+
+        .station-card.done .sc-icon {
+            border-color: rgba(0, 255, 136, .3);
+            background: rgba(0, 255, 136, .08)
+        }
+
+        .sc-info {
+            flex: 1
+        }
+
+        .sc-num {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--ac);
+            margin-bottom: 2px;
+            text-transform: uppercase
+        }
+
+        .sc-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 17px;
+            margin-bottom: 3px
+        }
+
+        .sc-loc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .4)
+        }
+
+        .sc-status {
+            font-size: 20px;
+            flex-shrink: 0
+        }
+
+        /* 제출 섹션 */
+        .submit-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            animation: fadeInUp .5s .2s ease both
+        }
+
+        /* 잠금 */
+        .locked {
+            text-align: center
+        }
+
+        .lock-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block
+        }
+
+        .lock-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 19px;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, .4)
+        }
+
+        .lock-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, .3);
+            line-height: 1.6
+        }
+
+        /* 제출 폼 */
+        .submit-form {
+            display: none
+        }
+
+        .submit-form.show {
+            display: block;
+            animation: unlockReveal .5s ease
+        }
+
+        @keyframes unlockReveal {
+            0% {
+                opacity: 0;
+                transform: scale(.9)
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        .sf-header {
+            text-align: center;
+            margin-bottom: 20px
+        }
+
+        .sf-emoji {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block
+        }
+
+        .sf-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 22px;
+            color: var(--green);
+            margin-bottom: 6px
+        }
+
+        .sf-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .5);
+            line-height: 1.6
+        }
+
+        .input-group {
+            margin-bottom: 14px
+        }
+
+        .input-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .5);
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 1px
+        }
+
+        .text-input {
+            width: 100%;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #fff;
+            font-size: 16px;
+            font-family: 'Noto Sans KR', sans-serif;
+            outline: none;
+            transition: border .2s
+        }
+
+        .text-input:focus {
+            border-color: var(--green)
+        }
+
+        .text-input::placeholder {
+            color: rgba(255, 255, 255, .2)
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 17px;
+            background: linear-gradient(135deg, #00ff88, #00c866);
+            color: #000;
+            border: none;
+            border-radius: 13px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 18px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all .2s;
+            margin-top: 4px
+        }
+
+        .submit-btn:active {
+            transform: scale(.97)
+        }
+
+        .submit-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed
+        }
+
+        /* 제출 완료 */
+        .submitted {
+            display: none;
+            text-align: center
+        }
+
+        .submitted.show {
+            display: block;
+            animation: unlockReveal .5s ease
+        }
+
+        .submitted-emoji {
+            font-size: 52px;
+            margin-bottom: 12px;
+            display: block
+        }
+
+        .submitted-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 22px;
+            color: var(--green);
+            margin-bottom: 8px
+        }
+
+        .submitted-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .5);
+            line-height: 1.7;
+            margin-bottom: 16px
+        }
+
+        .submitted-info {
+            background: rgba(0, 255, 136, .06);
+            border: 1px solid rgba(0, 255, 136, .15);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px
+        }
+
+        .si-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            font-size: 13px
+        }
+
+        .si-row:last-child {
+            border-bottom: none
+        }
+
+        .si-label {
+            color: rgba(255, 255, 255, .4)
+        }
+
+        .si-val {
+            font-weight: 700
+        }
+
+        .submit-note {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .3);
+            line-height: 1.6
+        }
+
+        /* 오류 */
+        .submit-error {
+            display: none;
+            text-align: center
+        }
+
+        .submit-error.show {
+            display: block
+        }
+
+        .err-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 17px;
+            color: var(--red);
+            margin-bottom: 8px
+        }
+
+        .err-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .5);
+            margin-bottom: 16px;
+            line-height: 1.6
+        }
+
+        .retry-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 45, 85, .12);
+            border: 1px solid rgba(255, 45, 85, .3);
+            color: var(--red);
+            border-radius: 12px;
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 15px;
+            cursor: pointer
+        }
+
+        /* 참여 방법 */
+        .how-to {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 16px;
+            animation: fadeInUp .5s .25s ease both
+        }
+
+        .ht-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(0, 200, 255, .7);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px
+        }
+
+        .ht-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, .55);
+            line-height: 1.5
+        }
+
+        .ht-step:last-child {
+            margin-bottom: 0
+        }
+
+        .ht-num {
+            background: rgba(0, 200, 255, .12);
+            color: var(--blue);
+            font-weight: 900;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        /* 파티클 */
+        .confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 500
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .sc-1 {
+            animation: fadeInUp .5s .15s ease both
+        }
+
+        .sc-2 {
+            animation: fadeInUp .5s .2s ease both
+        }
+
+        .sc-3 {
+            animation: fadeInUp .5s .25s ease both
+        }
+
+        .sc-4 {
+            animation: fadeInUp .5s .3s ease both
+        }
+
+        .sc-5 {
+            animation: fadeInUp .5s .35s ease both
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <div class="header">
+            <div class="badge">📍 QR 스탬프 랠리</div>
+            <h1 class="title">도박예방<br><em>스탬프 랠리</em></h1>
+            <p class="subtitle">5개 QR을 모두 스캔하고 미션을 완료하면<br>상품권 추첨 대상이 됩니다!</p>
+        </div>
+
+        <!-- 진행 현황 -->
+        <div class="progress-wrap">
+            <div class="pw-top">
+                <div class="pw-label">진행 현황</div>
+                <div class="pw-count" id="pwCount">0 / 5</div>
+            </div>
+            <div class="pw-bar-bg">
+                <div class="pw-bar" id="pwBar" style="width:0%"></div>
+            </div>
+            <div class="stamp-row">
+                <div class="stamp" id="stamp1">🧠</div>
+                <div class="stamp" id="stamp2">📊</div>
+                <div class="stamp" id="stamp3">📱</div>
+                <div class="stamp" id="stamp4">👨‍👩‍👧</div>
+                <div class="stamp" id="stamp5">💪</div>
+            </div>
+        </div>
+
+        <!-- 스테이션 목록 -->
+        <div class="stations">
+            <a href="qr1.html" class="station-card sc-1" id="card1">
+                <div class="sc-icon">🧠</div>
+                <div class="sc-info">
+                    <div class="sc-num">STATION 01</div>
+                    <div class="sc-title">도박과 뇌</div>
+                    <div class="sc-loc">📍 교문 앞</div>
+                </div>
+                <div class="sc-status" id="status1">▶</div>
+            </a>
+            <a href="qr2.html" class="station-card sc-2" id="card2">
+                <div class="sc-icon">📊</div>
+                <div class="sc-info">
+                    <div class="sc-num">STATION 02</div>
+                    <div class="sc-title">도박 피해 실제 사례</div>
+                    <div class="sc-loc">📍 1층 복도 게시판</div>
+                </div>
+                <div class="sc-status" id="status2">▶</div>
+            </a>
+            <a href="qr3.html" class="station-card sc-3" id="card3">
+                <div class="sc-icon">📱</div>
+                <div class="sc-info">
+                    <div class="sc-num">STATION 03</div>
+                    <div class="sc-title">스마트폰 도박의 함정</div>
+                    <div class="sc-loc">📍 급식실 앞</div>
+                </div>
+                <div class="sc-status" id="status3">▶</div>
+            </a>
+            <a href="qr4.html" class="station-card sc-4" id="card4">
+                <div class="sc-icon">👨‍👩‍👧</div>
+                <div class="sc-info">
+                    <div class="sc-num">STATION 04</div>
+                    <div class="sc-title">도박과 가족</div>
+                    <div class="sc-loc">📍 도서관·열람실</div>
+                </div>
+                <div class="sc-status" id="status4">▶</div>
+            </a>
+            <a href="qr5.html" class="station-card sc-5" id="card5">
+                <div class="sc-icon">💪</div>
+                <div class="sc-info">
+                    <div class="sc-num">STATION 05</div>
+                    <div class="sc-title">건강한 스트레스 해소법</div>
+                    <div class="sc-loc">📍 자치회실 앞</div>
+                </div>
+                <div class="sc-status" id="status5">▶</div>
+            </a>
+        </div>
+
+        <!-- 제출 섹션 -->
+        <div class="submit-section">
+
+            <!-- 잠금 -->
+            <div class="locked" id="lockedDiv">
+                <span class="lock-icon">🔏</span>
+                <div class="lock-title">5개 스테이션 모두 완료 시 제출 가능</div>
+                <p class="lock-desc">교내 5곳의 QR을 스캔하고<br>모든 미션을 완료하면 제출 폼이 열립니다!</p>
+            </div>
+
+            <!-- 제출 폼 -->
+            <div class="submit-form" id="submitForm">
+                <div class="sf-header">
+                    <span class="sf-emoji">🎉</span>
+                    <div class="sf-title">5개 모두 완료!</div>
+                    <p class="sf-desc">이름과 학번을 입력하면<br>상품권 추첨 대상에 등록됩니다!</p>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">이름</label>
+                    <input type="text" class="text-input" id="nameInput" placeholder="예) 홍길동" maxlength="6">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">학번</label>
+                    <input type="number" class="text-input" id="idInput" placeholder="예) 10101">
+                </div>
+                <button class="submit-btn" onclick="submitData()" id="submitBtn">📋 제출하기</button>
+            </div>
+
+            <!-- 제출 완료 -->
+            <div class="submitted" id="submittedDiv">
+                <span class="submitted-emoji">🏆</span>
+                <div class="submitted-title">제출 완료!</div>
+                <p class="submitted-desc">추첨 명단에 등록됐어요!<br>5월 21일(목) 점심 방송을 기다려주세요!</p>
+                <div class="submitted-info">
+                    <div class="si-row"><span class="si-label">이름</span><span class="si-val" id="siName">-</span></div>
+                    <div class="si-row"><span class="si-label">학번</span><span class="si-val" id="siId">-</span></div>
+                    <div class="si-row"><span class="si-label">완료 스테이션</span><span class="si-val">5 / 5</span></div>
+                    <div class="si-row"><span class="si-label">제출 시각</span><span class="si-val" id="siTime">-</span>
+                    </div>
+                </div>
+                <p class="submit-note">이 화면을 스크린샷으로 캡처해두세요!</p>
+            </div>
+
+            <!-- 오류 -->
+            <div class="submit-error" id="submitError">
+                <div class="err-title">😵 제출 오류</div>
+                <p class="err-desc" id="errMsg">네트워크 오류가 발생했습니다.<br>다시 시도해주세요.</p>
+                <button class="retry-btn" onclick="submitData()">🔄 다시 제출하기</button>
+            </div>
+
+        </div>
+
+        <div class="how-to">
+            <div class="ht-title">📋 참여 방법</div>
+            <div class="ht-step">
+                <div class="ht-num">1</div><span>교내 5곳의 QR코드를 스캔한다</span>
+            </div>
+            <div class="ht-step">
+                <div class="ht-num">2</div><span>각 스테이션의 글을 읽고 문제를 푼다</span>
+            </div>
+            <div class="ht-step">
+                <div class="ht-num">3</div><span>5개 모두 완료하면 이름·학번 입력 후 제출</span>
+            </div>
+            <div class="ht-step">
+                <div class="ht-num">4</div><span>5월 21일(목) 점심 방송 — 당첨자 발표!</span>
+            </div>
+        </div>
+
+    </div>
+
+    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+    <script>
+        const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL'; // Apps Script 웹앱 URL
+
+        const STATIONS = [
+            { key: 'qr1_done', cardId: 'card1', statusId: 'status1', stampId: 'stamp1' },
+            { key: 'qr2_done', cardId: 'card2', statusId: 'status2', stampId: 'stamp2' },
+            { key: 'qr3_done', cardId: 'card3', statusId: 'status3', stampId: 'stamp3' },
+            { key: 'qr4_done', cardId: 'card4', statusId: 'status4', stampId: 'stamp4' },
+            { key: 'qr5_done', cardId: 'card5', statusId: 'status5', stampId: 'stamp5' },
+        ];
+
+        function checkProgress() {
+            let done = 0;
+            STATIONS.forEach(s => {
+                if (localStorage.getItem(s.key) === '1') {
+                    done++;
+                    document.getElementById(s.cardId).classList.add('done');
+                    document.getElementById(s.statusId).innerHTML = '<span style="color:var(--green)">✓</span>';
+                    document.getElementById(s.stampId).classList.add('done');
+                }
+            });
+
+            const pct = done / 5 * 100;
+            document.getElementById('pwBar').style.width = pct + '%';
+            document.getElementById('pwCount').textContent = done + ' / 5';
+
+            // 이미 제출했으면
+            if (localStorage.getItem('qr_submitted') === '1') {
+                showSubmitted(); return;
+            }
+
+            if (done === 5) {
+                document.getElementById('lockedDiv').style.display = 'none';
+                document.getElementById('submitForm').classList.add('show');
+            }
+        }
+
+        async function submitData() {
+            const name = document.getElementById('nameInput').value.trim();
+            const sid = document.getElementById('idInput').value.trim();
+            if (!name) { alert('이름을 입력해주세요!'); return; }
+            if (!sid || sid.length < 4) { alert('학번을 입력해주세요!'); return; }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '제출 중...';
+            document.getElementById('submitError').classList.remove('show');
+
+            const payload = {
+                type: 'qr_rally',
+                name, studentId: sid,
+                qr1: localStorage.getItem('qr1_done') === '1',
+                qr2: localStorage.getItem('qr2_done') === '1',
+                qr3: localStorage.getItem('qr3_done') === '1',
+                qr4: localStorage.getItem('qr4_done') === '1',
+                qr5: localStorage.getItem('qr5_done') === '1',
+                submitTime: new Date().toISOString(),
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                localStorage.setItem('qr_submitted', '1');
+                localStorage.setItem('qr_name', name);
+                localStorage.setItem('qr_id', sid);
+                localStorage.setItem('qr_time', new Date().toLocaleString('ko-KR'));
+                showSubmitted();
+                launchConfetti();
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = '📋 제출하기';
+                document.getElementById('submitError').classList.add('show');
+                document.getElementById('errMsg').textContent = '오류: ' + err.message;
+            }
+        }
+
+        function showSubmitted() {
+            document.getElementById('lockedDiv').style.display = 'none';
+            document.getElementById('submitForm').classList.remove('show');
+            document.getElementById('submitForm').style.display = 'none';
+            document.getElementById('submittedDiv').classList.add('show');
+            document.getElementById('siName').textContent = localStorage.getItem('qr_name') || '-';
+            document.getElementById('siId').textContent = localStorage.getItem('qr_id') || '-';
+            document.getElementById('siTime').textContent = localStorage.getItem('qr_time') || '-';
+        }
+
+        function launchConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const colors = ['#00ff88', '#ffe600', '#ff2d55', '#00c8ff', '#ff6b00', '#fff'];
+            const pieces = Array.from({ length: 100 }, () => ({
+                x: Math.random() * canvas.width, y: -10 - Math.random() * 100,
+                w: 5 + Math.random() * 7, h: 5 + Math.random() * 7,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speed: 2 + Math.random() * 4, spin: Math.random() * .3 - .15,
+                angle: Math.random() * Math.PI * 2,
+            }));
+            let f = 0;
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pieces.forEach(p => {
+                    p.y += p.speed; p.angle += p.spin;
+                    ctx.save(); ctx.globalAlpha = Math.max(0, 1 - p.y / canvas.height);
+                    ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+                    ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                });
+                if (++f < 150) requestAnimationFrame(draw);
+                else ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            draw();
+        }
+
+        window.addEventListener('load', checkProgress);
+        window.addEventListener('focus', checkProgress);
+    </script>
+</body>
+
+</html>
