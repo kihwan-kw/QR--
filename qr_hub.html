@@ -785,12 +785,7 @@
                 <p class="submit-note">이 화면을 스크린샷으로 캡처해두세요!</p>
             </div>
 
-            <!-- 오류 -->
-            <div class="submit-error" id="submitError">
-                <div class="err-title">😵 제출 오류</div>
-                <p class="err-desc" id="errMsg">네트워크 오류가 발생했습니다.<br>다시 시도해주세요.</p>
-                <button class="retry-btn" onclick="submitData()">🔄 다시 제출하기</button>
-            </div>
+
 
         </div>
 
@@ -815,7 +810,10 @@
     <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
 
     <script>
-        const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL'; // Apps Script 웹앱 URL
+        // 구글 설문지 URL (entry 파라미터로 학번/이름 자동 입력)
+        const FORM_BASE = 'https://docs.google.com/forms/d/e/1FAIpQLSdUxIyewSQ4V2nfd9lWYQHx9z0jVZfuUJJ75BXl6uylCHFMSA/viewform';
+        const ENTRY_STUDENT_ID = 'entry.752762419';   // 학번 필드
+        const ENTRY_NAME       = 'entry.1948160180';  // 이름 필드
 
         const STATIONS = [
             { key: 'qr1_done', cardId: 'card1', statusId: 'status1', stampId: 'stamp1' },
@@ -851,47 +849,27 @@
             }
         }
 
-        async function submitData() {
+        function submitData() {
             const name = document.getElementById('nameInput').value.trim();
             const sid = document.getElementById('idInput').value.trim();
             if (!name) { alert('이름을 입력해주세요!'); return; }
             if (!sid || sid.length < 4) { alert('학번을 입력해주세요!'); return; }
 
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = '제출 중...';
-            document.getElementById('submitError').classList.remove('show');
+            // 로컬에 저장
+            localStorage.setItem('qr_submitted', '1');
+            localStorage.setItem('qr_name', name);
+            localStorage.setItem('qr_id', sid);
+            localStorage.setItem('qr_time', new Date().toLocaleString('ko-KR'));
 
-            const payload = {
-                type: 'qr_rally',
-                name, studentId: sid,
-                qr1: localStorage.getItem('qr1_done') === '1',
-                qr2: localStorage.getItem('qr2_done') === '1',
-                qr3: localStorage.getItem('qr3_done') === '1',
-                qr4: localStorage.getItem('qr4_done') === '1',
-                qr5: localStorage.getItem('qr5_done') === '1',
-                submitTime: new Date().toISOString(),
-            };
+            // 이름·학번을 pre-fill한 구글 설문지를 새 탭으로 열기
+            const url = FORM_BASE
+                + '?' + ENTRY_STUDENT_ID + '=' + encodeURIComponent(sid)
+                + '&' + ENTRY_NAME       + '=' + encodeURIComponent(name);
+            window.open(url, '_blank');
 
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                localStorage.setItem('qr_submitted', '1');
-                localStorage.setItem('qr_name', name);
-                localStorage.setItem('qr_id', sid);
-                localStorage.setItem('qr_time', new Date().toLocaleString('ko-KR'));
-                showSubmitted();
-                launchConfetti();
-            } catch (err) {
-                btn.disabled = false;
-                btn.textContent = '📋 제출하기';
-                document.getElementById('submitError').classList.add('show');
-                document.getElementById('errMsg').textContent = '오류: ' + err.message;
-            }
+            // 제출 완료 화면으로 전환
+            showSubmitted();
+            launchConfetti();
         }
 
         function showSubmitted() {
