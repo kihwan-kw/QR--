@@ -399,7 +399,7 @@
 <body>
     <div class="wrap">
         <div class="top-bar">
-            <a href="qr_hub.html" class="back-btn">← 허브</a>
+            <a href="index.html" class="back-btn">← 허브</a>
             <span class="station-tag">📊 STATION 02</span>
         </div>
 
@@ -473,7 +473,7 @@
             document.getElementById('nextBtn').style.background = 'rgba(0,255,136,.2)';
             document.getElementById('nextBtn').style.border = '1px solid rgba(0,255,136,.3)';
             document.getElementById('nextBtn').style.color = '#00ff88';
-            document.getElementById('nextBtn').onclick = () => location.href = 'qr_hub.html';
+            document.getElementById('nextBtn').onclick = () => location.href = 'index.html';
         }
 
         // 글 읽기 진행도
@@ -555,7 +555,7 @@
 
         function complete() {
             localStorage.setItem(KEY, '1');
-            location.href = 'qr_hub.html';
+            location.href = 'index.html';
         }
     </script>
 </body>
